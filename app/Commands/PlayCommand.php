@@ -3,9 +3,12 @@
 namespace App\Commands;
 
 use App\Contracts\Discord\DiscordManager;
+use App\Contracts\Routines\Repository;
 use App\Games\Program\ProgramSession;
 use App\Games\Reminders\RemindersSession;
 use App\Games\Test\TestSession;
+use App\Routines\MainRoutine;
+use Discord\Discord;
 use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
 
@@ -30,12 +33,11 @@ class PlayCommand extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(Discord $discord, Repository $repository)
     {
-        app(TestSession::class);
-        app(ProgramSession::class);
-        app(RemindersSession::class);
-        app(DiscordManager::class)->run();
+        $discord->on('ready', fn () => $repository->create(MainRoutine::class)->initialize());
+
+        $discord->run();
     }
 
     /**

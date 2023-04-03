@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Discord\Discord;
 use Illuminate\Support\ServiceProvider;
 
 class DiscordServiceProvider extends ServiceProvider
@@ -23,6 +24,10 @@ class DiscordServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(\App\Contracts\Discord\DiscordManager::class, \App\Util\Discord\DiscordManager::class);
+        $this->app->singleton(Discord::class, function() {
+            return new Discord([
+                'token' => config('discord.token'),
+            ]);
+        });
     }
 }
