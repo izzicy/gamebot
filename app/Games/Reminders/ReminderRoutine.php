@@ -52,10 +52,6 @@ class ReminderRoutine implements Routine, WantsRepository, WantsDiscord
     {
         $user = $message->author;
 
-        if ($user instanceof Member) {
-            $user = $user->user;
-        }
-
         if (str_contains($message->content, 'enter saying hi mode')) {
             if ($this->repository->tagsExists(['reminder', 'user:' . $user->id])) {
                 $message->channel->sendMessage('I\'m already in saying hi mode!');
