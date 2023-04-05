@@ -10,11 +10,11 @@ class Pixel extends Model
     const UPDATED_AT = null;
 
     /**
-     * The table associated with the model.
+     * The connection name for the model.
      *
-     * @var string
+     * @var string|null
      */
-    protected $table = 'zdg_pixels';
+    protected $connection = 'zero_dollar_game';
 
     /**
      * The attributes that aren't mass assignable.
