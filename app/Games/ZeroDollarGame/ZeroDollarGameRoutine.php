@@ -100,6 +100,8 @@ class ZeroDollarGameRoutine implements Routine
 
         if (str_contains($message->content, 'emergency_shutdown')) {
             $message->channel->sendMessage('Game has stopped.');
+
+            $this->repository->destroyByTags(['zero_dollar_game', 'subroutine']);
         }
     }
 }
