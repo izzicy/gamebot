@@ -5,6 +5,7 @@ namespace App\Routines;
 use App\Contracts\Routines\Routine;
 use App\Contracts\Routines\WantsRepository;
 use App\Games\Reminders\ReminderRoutine;
+use App\Games\ZeroDollarGame\ZeroDollarGameRoutine;
 use App\Games\WhoAmI\WhoAmIRoutine;
 use App\Routines\Concerns\HasId;
 use App\Routines\Concerns\WantsRepositoryConcern;
@@ -36,6 +37,7 @@ class MainRoutine implements Routine, WantsRepository
         $this->routines = [];
         $this->startRoutine(ReminderRoutine::class);
         $this->startRoutine(WhoAmIRoutine::class);
+        $this->startRoutine(ZeroDollarGameRoutine::class);
     }
 
     /**

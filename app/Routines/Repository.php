@@ -50,7 +50,13 @@ class Repository implements RepositoryContract
     public function create($class, $parameters = []): Routine
     {
         /** @var Routine */
-        $routine = $this->con->make($class, $parameters);
+        $routine = $this->con->make($class, array_merge(
+            [
+                'repository' => $this,
+                'discord' => $this->discord,
+            ],
+            $parameters,
+        ));
 
         if ($routine instanceof WantsRepository) {
             $routine->withRepository($this);
