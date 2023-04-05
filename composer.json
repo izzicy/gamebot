@@ -22,6 +22,7 @@
         "laravel-zero/framework": "^10",
         "nunomaduro/termwind": "^1.13",
         "react/promise-timer": "^1.9",
+        "spatie/color": "^1.5",
         "team-reflex/discord-php": "^7.3"
     },
     "require-dev": {
