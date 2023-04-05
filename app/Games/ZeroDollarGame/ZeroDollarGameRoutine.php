@@ -97,5 +97,9 @@ class ZeroDollarGameRoutine implements Routine
                 ])->initialize();
             }
         }
+
+        if (str_contains($message->content, 'emergency_shutdown')) {
+            $message->channel->sendMessage('Game has stopped.');
+        }
     }
 }
