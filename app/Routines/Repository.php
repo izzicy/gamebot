@@ -133,11 +133,13 @@ class Repository implements RepositoryContract
      */
     protected function destroyById($id)
     {
-        if ( ! empty($this->routinesById[$id])) {
-            $this->routinesById[$id]->destroy();
-        }
+        $routine = $this->routinesById[$id] ?? null;
 
         $this->removeById($id);
+
+        if ($routine) {
+            $routine->destroy();
+        }
     }
 
     /**
