@@ -52,7 +52,8 @@ class OngoingGame implements Routine
      */
     public function initialize()
     {
-        $this->drawAndSendClearGame();
+        $this->sendGame(true);
+        $this->sendGame();
 
         $this->discord->on(Event::MESSAGE_CREATE, [$this, 'onMessage']);
     }
@@ -84,6 +85,9 @@ class OngoingGame implements Routine
         foreach ($lines as $line) {
             if (preg_match('/(paint|color|colour|pixel) *(?P<arguments>.*)/i', $line, $matches)) {
                 $this->handlePaintCommand($message->author, $matches['arguments']);
+
+                $this->sendGame(true);
+                $this->sendGame();
             }
         }
     }
@@ -93,10 +97,10 @@ class OngoingGame implements Routine
      *
      * @return ExtendedPromiseInterface
      */
-    protected function drawAndSendClearGame()
+    protected function sendGame($includeGrid = false)
     {
         $channel = $this->discord->getChannel($this->game->channel_id);
-        $image = ImageManagerStatic::make($this->gameDrawer->draw($this->game));
+        $image = ImageManagerStatic::make($this->gameDrawer->draw($this->game, $includeGrid));
         $path = tempnam(sys_get_temp_dir(), '') . '.png';
         $image->save($path);
 
@@ -139,10 +143,10 @@ class OngoingGame implements Routine
     protected function handleRangePaintCommand($user, $command)
     {
         if (preg_match('/(?P<x1>\d+) +(?P<y1>\d+) +to +(?P<x2>\d+) +(?P<y2>\d+)( +(?P<modifier>dark|light)? *(?P<choice>[a-z0-9 #]+))?/i', $command, $matches)) {
-            $x1 = $matches['x1'];
-            $y1 = $matches['y1'];
-            $x2 = $matches['x2'];
-            $y2 = $matches['y2'];
+            $x1 = $matches['x1'] - 1;
+            $y1 = $matches['y1'] - 1;
+            $x2 = $matches['x2'] - 1;
+            $y2 = $matches['y2'] - 1;
             $modifier = $matches['modifier'] ?? null;
             $choice = $matches['choice'] ?? null;
 
@@ -150,6 +154,22 @@ class OngoingGame implements Routine
                 foreach (range($y1, $y2) as $y) {
                     $gatheredPixels[] = [$x, $y];
                 }
+            }
+
+            if ($x1 < 0 || $x1 >= $this->game->width) {
+                return;
+            }
+
+            if ($y1 < 0 || $y1 >= $this->game->height) {
+                return;
+            }
+
+            if ($x2 < 0 || $x2 >= $this->game->width) {
+                return;
+            }
+
+            if ($y2 < 0 || $y2 >= $this->game->height) {
+                return;
             }
 
             if ($choice) {
@@ -168,12 +188,20 @@ class OngoingGame implements Routine
     protected function handleSinglePaintCommand($user, $command)
     {
         if (preg_match('/(?P<x>\d+) +(?P<y>\d+)( +(?P<modifier>dark|light)? *(?P<choice>[a-z0-9 #]+))?/i', $command, $matches)) {
-            $x = $matches['x'];
-            $y = $matches['y'];
+            $x = $matches['x'] - 1;
+            $y = $matches['y'] - 1;
             $modifier = $matches['modifier'] ?? null;
             $choice = $matches['choice'] ?? null;
 
             $gatheredPixels[] = [$x, $y];
+
+            if ($x < 0 || $x >= $this->game->width) {
+                return;
+            }
+
+            if ($y < 0 || $y >= $this->game->height) {
+                return;
+            }
 
             if ($choice) {
                 $this->paintPixels($user, $modifier, $gatheredPixels, $choice);

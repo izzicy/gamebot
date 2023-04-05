@@ -21,9 +21,9 @@ class GameDrawer
         $pixelSize = 10;
         $canvas = ImageManagerStatic::canvas($width * $pixelSize, $height * $pixelSize, '#ffffff');
 
-        $game->recentPixels()->get()->each(function($pixel) use ($pixelSize, $canvas) {
+        $game->recentPixels()->get()->each(function($pixel) use ($pixelSize, $canvas, $game) {
             $x = $pixel->posx;
-            $y = $pixel->posy;
+            $y = $game->height - $pixel->posy - 1;
 
             $canvas->insert(
                 ImageManagerStatic::canvas($pixelSize, $pixelSize, $pixel->getRgb()),
@@ -33,9 +33,29 @@ class GameDrawer
             );
         });
 
-        if ($withGrid === false) {
-            return $canvas->getCore();
+        $cacheFilepath = $this->cacheFile($game);
+
+        $canvas->save($cacheFilepath);
+
+        if ($withGrid) {
+            $canvas = $this->applyGrid($game, $canvas);
         }
+
+        return $canvas->getCore();
+    }
+
+    /**
+     * Draw the zdg.
+     *
+     * @param Game $game
+     * @param \Intervention\Image\Image $canvas
+     * @return \Intervention\Image\Image
+     */
+    protected function applyGrid($game, $canvas)
+    {
+        $width = $game->width;
+        $height = $game->height;
+        $pixelSize = 10;
 
         foreach (range(1, $width - 1) as $x) {
             $canvas->rectangle($x * $pixelSize, 0, $x * $pixelSize, $height * $pixelSize, function ($draw) {
@@ -91,6 +111,17 @@ class GameDrawer
 
         $outerCanvas->insert($canvas, 'top-left', $pixelSize, $pixelSize);
 
-        return $outerCanvas->getCore();
+        return $outerCanvas;
+    }
+
+    /**
+     * Get the cache file.
+     *
+     * @param Game $game
+     * @return string
+     */
+    protected function cacheFile($game)
+    {
+        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . sha1($game->getKey() . 'zdg-cache-file') . '.jpg';
     }
 }
