@@ -36,9 +36,9 @@ class MainRoutine implements Routine, WantsRepository
     public function initialize()
     {
         $this->routines = [];
-        // $this->startRoutine(ReminderRoutine::class);
-        // $this->startRoutine(WhoAmIRoutine::class);
-        // $this->startRoutine(ZeroDollarGameRoutine::class);
+        $this->startRoutine(ReminderRoutine::class);
+        $this->startRoutine(WhoAmIRoutine::class);
+        $this->startRoutine(ZeroDollarGameRoutine::class);
         $this->startRoutine(ChooseYourDoorRoutine::class);
         // $this->startRoutine(ResolveRoutine::class);
     }
