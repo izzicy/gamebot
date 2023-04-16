@@ -4,6 +4,7 @@ namespace App\Routines;
 
 use App\Contracts\Routines\Routine;
 use App\Contracts\Routines\WantsRepository;
+use App\Games\ChooseYourDoor\ChooseYourDoorRoutine;
 use App\Games\Reminders\ReminderRoutine;
 use App\Games\ZeroDollarGame\ZeroDollarGameRoutine;
 use App\Games\WhoAmI\WhoAmIRoutine;
@@ -35,9 +36,11 @@ class MainRoutine implements Routine, WantsRepository
     public function initialize()
     {
         $this->routines = [];
-        $this->startRoutine(ReminderRoutine::class);
-        $this->startRoutine(WhoAmIRoutine::class);
-        $this->startRoutine(ZeroDollarGameRoutine::class);
+        // $this->startRoutine(ReminderRoutine::class);
+        // $this->startRoutine(WhoAmIRoutine::class);
+        // $this->startRoutine(ZeroDollarGameRoutine::class);
+        $this->startRoutine(ChooseYourDoorRoutine::class);
+        // $this->startRoutine(ResolveRoutine::class);
     }
 
     /**

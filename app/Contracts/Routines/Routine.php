@@ -2,6 +2,8 @@
 
 namespace App\Contracts\Routines;
 
+use React\Promise\PromiseInterface;
+
 interface Routine
 {
     /**
@@ -14,7 +16,7 @@ interface Routine
     /**
      * Intialize the routine when Discord is active.
      *
-     * @return void
+     * @return PromiseInterface|void
      */
     public function initialize();
 
@@ -28,7 +30,7 @@ interface Routine
     /**
      * Destroy the routine.
      *
-     * @return void
+     * @return PromiseInterface|void
      */
     public function destroy();
 }
