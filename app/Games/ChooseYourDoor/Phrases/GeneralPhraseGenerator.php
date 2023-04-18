@@ -3,11 +3,14 @@
 namespace App\Games\ChooseYourDoor\Phrases;
 
 use App\Games\ChooseYourDoor\Contracts\PhraseGenerator;
+use App\Games\ChooseYourDoor\Phrases\Concerns\CreatesItemsInSeries;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 
 class GeneralPhraseGenerator implements PhraseGenerator
 {
+    use CreatesItemsInSeries;
+
     /**
      * List of generators.
      *
@@ -39,29 +42,11 @@ class GeneralPhraseGenerator implements PhraseGenerator
             $usernamesSeries = $this->createItemsInSeries($usernames);
             $cheaterPhrases = __('choose-your-door.cheater_callouts');
 
-            return __(Arr::random($cheaterPhrases), ['usernames' => $usernamesSeries]);
+            return trans_choice(Arr::random($cheaterPhrases), count($usernames), ['usernames' => $usernamesSeries]);
         }
 
         $generator = Arr::random($this->generators);
 
         return $generator->make($usernames, $state);
-    }
-
-    /**
-     * Create an items in series.
-     *
-     * @param string[] $nouns
-     * @return string
-     */
-    protected function createItemsInSeries($nouns)
-    {
-        if (count($nouns) === 1) {
-            return '**' . Arr::first($nouns) . '**';
-        }
-
-        $nounsWithoutLast = $nouns;
-        $lastItem = array_pop($nounsWithoutLast);
-
-        return '**' . implode(', ', $nounsWithoutLast) . ', and ' . $lastItem . '**';
     }
 }

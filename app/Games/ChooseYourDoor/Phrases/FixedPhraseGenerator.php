@@ -3,10 +3,13 @@
 namespace App\Games\ChooseYourDoor\Phrases;
 
 use App\Games\ChooseYourDoor\Contracts\PhraseGenerator;
+use App\Games\ChooseYourDoor\Phrases\Concerns\CreatesItemsInSeries;
 use Illuminate\Support\Arr;
 
 class FixedPhraseGenerator implements PhraseGenerator
 {
+    use CreatesItemsInSeries;
+
     /**
      * @inheritdoc
      */
@@ -17,31 +20,13 @@ class FixedPhraseGenerator implements PhraseGenerator
         $losePhrases = __('choose-your-door.lose_fixed_phrases');
 
         if ($state === 'WIN') {
-            return __(Arr::random($winPhrases), ['usernames' => $usernamesSeries]);
+            return trans_choice(Arr::random($winPhrases), count($usernames), ['usernames' => $usernamesSeries]);
         }
 
         if ($state === 'LOSE') {
-            return __(Arr::random($losePhrases), ['usernames' => $usernamesSeries]);
+            return trans_choice(Arr::random($losePhrases), count($usernames), ['usernames' => $usernamesSeries]);
         }
 
         return '';
-    }
-
-    /**
-     * Create an items in series.
-     *
-     * @param string[] $nouns
-     * @return string
-     */
-    protected function createItemsInSeries($nouns)
-    {
-        if (count($nouns) === 1) {
-            return '**' . Arr::first($nouns) . '**';
-        }
-
-        $nounsWithoutLast = $nouns;
-        $lastItem = array_pop($nounsWithoutLast);
-
-        return '**' . implode(', ', $nounsWithoutLast) . ', and ' . $lastItem . '**';
     }
 }

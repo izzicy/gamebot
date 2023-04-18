@@ -3,10 +3,13 @@
 namespace App\Games\ChooseYourDoor\Phrases;
 
 use App\Games\ChooseYourDoor\Contracts\PhraseGenerator;
+use App\Games\ChooseYourDoor\Phrases\Concerns\CreatesItemsInSeries;
 use Illuminate\Support\Arr;
 
 class ThingPhraseGenerator implements PhraseGenerator
 {
+    use CreatesItemsInSeries;
+
     /**
      * @inheritdoc
      */
@@ -23,7 +26,7 @@ class ThingPhraseGenerator implements PhraseGenerator
         $losePlaces = __('choose-your-door.lose_places');
 
         if ($state === 'WIN') {
-            return __(Arr::random($winPhrases), [
+            return trans_choice(Arr::random($winPhrases), count($usernames), [
                 'usernames' => $usernamesSeries,
                 'thing' => Arr::random($winThings),
                 'place' => Arr::random($winPlaces),
@@ -31,7 +34,7 @@ class ThingPhraseGenerator implements PhraseGenerator
         }
 
         if ($state === 'LOSE') {
-            return __(Arr::random($losePhrases), [
+            return trans_choice(Arr::random($losePhrases), count($usernames), [
                 'usernames' => $usernamesSeries,
                 'thing' => Arr::random($loseThings),
                 'place' => Arr::random($losePlaces),
