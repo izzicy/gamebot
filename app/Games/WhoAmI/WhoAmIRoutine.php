@@ -51,7 +51,7 @@ class WhoAmIRoutine implements Routine, WantsDiscord
         ) {
             $message->channel->sendMessage(
                 MessageBuilder::new()
-                    ->setContent('You name is ' . $message->author->username . '.')
+                    ->setContent('Your name is ' . $message->author->username . '.')
                     ->setReplyTo($message)
             );
         }
