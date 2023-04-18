@@ -14,6 +14,11 @@ return [
         'Choose your door!',
         'Take your pick!',
         'A door can be chosen!',
+        'Pick a door!',
+        'Make your choice!',
+        'Choose wisely!',
+        'Time to choose!',
+        'Make your choice!',
     ],
 
     /*
@@ -26,7 +31,8 @@ return [
     */
 
     'win_fixed_phrases' => [
-        ':usernames won a lifetime supply of pizza and danced with joy, declaring every day "Pizza Day" for the rest of their lives.',
+        '{1} :usernames won a lifetime supply of pizza and danced with joy, declaring every day "Pizza Day" for the rest of their life.
+        |[2,*] :usernames won a lifetime supply of pizza and danced with joy, declaring every day "Pizza Day" for the rest of their lives.',
         'Winning the lottery allowed :usernames to retire to a private island, where they spent their days sipping cocktails and soaking up the sun.',
         ':usernames won a trip to space and returned to Earth with a newfound appreciation for the universe and their place in it.',
         ':usernames won a giant golden statue of their pet cat, which they proudly displayed in the town square.',
@@ -49,12 +55,20 @@ return [
     'lose_fixed_phrases' => [
         ':usernames lost their hair in a freak accident involving a rogue hair dryer and a swarm of bees, and had to wear wigs for weeks.',
         ':usernames got struck by lightning and developed superpowers, but found that their newfound abilities only caused chaos and destruction.',
-        ':usernames all got trapped in an elevator for hours, subsisting only on stale crackers and warm water.',
-        ':usernames accidentally boarded a plane to a remote island where they were forced to fend for themselves in the wilderness for weeks.',
+        '{1} :usernames was trapped in an elevator for hours, subsisting only on stale crackers and warm water.
+        |[2,*] :usernames were trapped in an elevator for hours, subsisting only on stale crackers and warm water.',
+        '{1} :usernames accidentally boarded a plane to a remote island where they were forced to fend for themself in the wilderness for weeks.
+        |[2,*] :usernames accidentally boarded a plane to a remote island where they were forced to fend for themselves in the wilderness for weeks.',
         ':usernames accidentally stumbled into a portal to a parallel universe, where everything was upside down and nothing made sense.',
         ':usernames accidentally opened a cursed sarcophagus, unleashing a mummy that haunted them for weeks and causing them to have the worst luck imaginable.',
-        ':usernames suddenly got transported to a dimension where everything was made out of candy, but soon discovered that their sweet surroundings were actually quite dangerous.',
-        ':usernames suddenly got cursed with a musical number that they couldn\'t stop singing, making it impossible to communicate with others without breaking into song.',
+        '{1} :usernames was transported to a dimension where everything was made out of candy, but soon discovered that their sweet surroundings were actually quite dangerous.
+        |[2,*] :usernames were transported to a dimension where everything was made out of candy, but soon discovered that their sweet surroundings were actually quite dangerous.',
+        '{1} :usernames was cursed with a musical number that they couldn\'t stop singing, making it impossible to communicate with others without breaking into song.
+        |[2,*] :usernames were cursed with a musical number that they couldn\'t stop singing, making it impossible to communicate with others without breaking into song.',
+        '{1} :usernames was cursed by a vengeful witch and turned into a garden gnome, unable to move or communicate with the outside world.
+        |[2,*] :usernames were cursed by a vengeful witch and turned into garden gnomes, unable to move or communicate with the outside world.',
+        '{1} :usernames was struck by a freak lightning storm that caused them to shrink down to the size of ants, facing danger at every turn as they navigated through a world full of giant creatures.
+        |[2,*] :usernames were struck by a freak lightning storm that caused them to shrink down to the size of ants, facing danger at every turn as they navigated through a world full of giant creatures.',
     ],
 
     /*
@@ -67,11 +81,16 @@ return [
     */
 
     'win_thing_phrases' => [
-        ':usernames stumbled upon :thing :place and were instantly imbued with superhuman powers!',
-        'After months of searching, :usernames finally discovered :thing :place, and their minds were blown wide open with newfound knowledge!',
-        'When :usernames found themselves :place and found :thing, they were overcome with joy and started dancing like madmen!',
+        '{1} :usernames stumbled upon :thing :place and was instantly imbued with superhuman powers!
+        |[2,*] :usernames stumbled upon :thing :place and were instantly imbued with superhuman powers!',
+        '{1} After months of searching, :usernames finally discovered :thing :place, and their mind were blown wide open with newfound knowledge!
+        |[2,*] After months of searching, :usernames finally discovered :thing :place, and their minds were blown wide open with newfound knowledge!',
+        '{1} When :usernames found themself :place and found :thing, they were overcome with joy and started dancing like madmen!
+        |[2,*] When :usernames found themselves :place and found :thing, they were overcome with joy and started dancing like madmen!',
         ':usernames stumbled upon :thing :place and were suddenly transported to a magical land filled with unicorns and rainbows!',
-        ':usernames discovered :thing :place and gained the ability to play any instrument, leading to a wild jam session that lasted for days!'
+        ':usernames discovered :thing :place and gained the ability to play any instrument, leading to a wild jam session that lasted for days!',
+        'When out looking for :thing :place, :usernames instead found the lost works of Archimedes!',
+        'During their time at :place, :usernames stumbled upon :thing!',
     ],
 
     /*
@@ -94,6 +113,7 @@ return [
         'a joyfull zebra',
         'a mouth-watering chocolate bar',
         'a high quality safety vest',
+        'the sandwhich',
     ],
 
     /*
@@ -112,7 +132,6 @@ return [
         'at the laboratory',
         'at the local laundromat',
         'at the local supermarket',
-        'at the highest peak in all of the realms',
         'at Mount Everest',
         'in Amsterdam',
     ],
@@ -128,9 +147,11 @@ return [
 
     'lose_thing_phrases' => [
         'After :usernames discovered :thing :place, they were plagued by a series of bizarre accidents and unexplained phenomena, all of which seemed to be connected to their discovery!',
-        ':usernames found :thing at :place and uncovered a deadly booby trap that threatened to unleash a swarm of venomous snakes upon them!',
+        ':usernames found :thing :place and uncovered a deadly booby trap that threatened to unleash a swarm of venomous snakes upon them!',
         'After :usernames found :thing :place, they unwittingly stumbled into a war zone, where they were caught in the crossfire between rival factions!',
         ':usernames found :thing :place, and it turned out to be a cursed object that brought all of their worst fears and nightmares to life!',
+        ':usernames found :thing while they were :place and it was terrible!',
+        'During their trip :place, :usernames found :thing. How outrageous!',
     ],
 
     /*
@@ -152,6 +173,7 @@ return [
         'a cracked coffee cup',
         'some sack of dull marbles',
         'a bottle of oderless perfume',
+        'a funny-looking ventilation duct',
     ],
 
     /*
@@ -174,6 +196,7 @@ return [
         'at some place far from home',
         'in Ohio',
         'at the moon',
+        'at the Foobar',
     ],
 
     /*
@@ -187,7 +210,7 @@ return [
 
     'cheater_callouts' => [
         ':usernames cheated at this game!',
-        ':usernames tried to cheat this game!',
+        ':usernames tried to cheat at this game!',
         ':usernames thought they were clever!',
         ':usernames made an attempt to circumvent the rules of the game!',
     ],
