@@ -3,16 +3,31 @@
 namespace App\Games\WhoAmI;
 
 use App\Contracts\Routines\Routine;
-use App\Contracts\Routines\WantsDiscord;
+use App\Discord\Contracts\InteractionDispatcher;
 use App\Routines\Concerns\HasId;
-use App\Routines\Concerns\WantsDiscordConcern;
+use Discord\Builders\CommandBuilder;
 use Discord\Builders\MessageBuilder;
-use Discord\Parts\Channel\Message;
+use Discord\Discord;
+use Discord\Parts\Interactions\Interaction;
 use Discord\WebSockets\Event;
 
-class WhoAmIRoutine implements Routine, WantsDiscord
+class WhoAmIRoutine implements Routine
 {
-    use HasId, WantsDiscordConcern;
+    use HasId;
+
+    /**
+     * Construct whoami routine.
+     *
+     * @param Discord $discord
+     * @param InteractionDispatcher $dispatcher
+     */
+    public function __construct(
+        protected Discord $discord,
+        protected InteractionDispatcher $dispatcher,
+    )
+    {
+        //
+    }
 
     /**
      * @inheritdoc
@@ -27,7 +42,15 @@ class WhoAmIRoutine implements Routine, WantsDiscord
      */
     public function initialize()
     {
-        $this->discord->on(Event::MESSAGE_CREATE, [$this, 'onMessage']);
+        $this->discord->application->commands->save(
+            $this->discord->application->commands->create(CommandBuilder::new()
+                ->setName('whoami')
+                ->setDescription('Tells who you are.')
+                ->toArray()
+            )
+        )->then([$this->dispatcher, 'register']);
+
+        $this->dispatcher->on('whoami', [$this, 'onCommand']);
     }
 
     /**
@@ -35,25 +58,20 @@ class WhoAmIRoutine implements Routine, WantsDiscord
      */
     public function destroy()
     {
-        $this->discord->removeListener(Event::MESSAGE_CREATE, [$this, 'onMessage']);
+        $this->dispatcher->removeListener('whoami', [$this, 'onCommand']);
     }
 
     /**
      * On message callback.
      *
-     * @param Message $message
+     * @param Interaction $interaction
      * @return void
      */
-    public function onMessage(Message $message)
+    public function onCommand(Interaction $interaction)
     {
-        if (
-            preg_match('/^(Say my name.?)|(Who am I\??)|(What am I called\??)|(whoami)|test123$/i', $message->content)
-        ) {
-            $message->channel->sendMessage(
-                MessageBuilder::new()
-                    ->setContent('Your name is ' . $message->author->username . '.')
-                    ->setReplyTo($message)
-            );
-        }
+        $interaction->respondWithMessage(
+            MessageBuilder::new()
+                ->setContent('Your name is ' . $interaction->user->username . '.')
+        );
     }
 }

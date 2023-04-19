@@ -29,5 +29,7 @@ class DiscordServiceProvider extends ServiceProvider
                 'token' => config('discord.token'),
             ]);
         });
+
+        $this->app->singleton(\App\Discord\Contracts\InteractionDispatcher::class, \App\Discord\InteractionDispatcher::class);
     }
 }
