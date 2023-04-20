@@ -4,19 +4,23 @@ namespace App\Games\ZeroDollarGame;
 
 use App\Contracts\Routines\Repository;
 use App\Contracts\Routines\Routine;
+use App\Discord\Contracts\InteractionDispatcher;
 use App\Games\ZeroDollarGame\Models\Game;
 use App\Games\ZeroDollarGame\Models\Pixel;
 use App\Routines\Concerns\HasId;
+use Discord\Builders\CommandBuilder;
 use Discord\Builders\MessageBuilder;
 use Discord\Discord;
-use Discord\Parts\Channel\Message;
+use Discord\Parts\Channel\Attachment;
+use Discord\Parts\Interactions\Command\Option;
+use Discord\Parts\Interactions\Interaction;
 use Discord\Parts\User\User;
-use Discord\WebSockets\Event;
 use Intervention\Image\ImageManagerStatic;
 use Spatie\Color\Exceptions\InvalidColorValue;
 use Spatie\Color\Factory;
 use Spatie\Color\Hex;
 use Spatie\Color\Hsl;
+use Spatie\Color\Rgb;
 
 class OngoingGame implements Routine
 {
@@ -27,12 +31,14 @@ class OngoingGame implements Routine
      *
      * @param Discord $discord
      * @param Repository $repository
+     * @param InteractionDispatcher $dispatcher
      * @param Game $game
      * @param GameDrawer $gameDrawer
      */
     public function __construct(
         protected Discord $discord,
         protected Repository $repository,
+        protected InteractionDispatcher $dispatcher,
         protected Game $game,
         protected GameDrawer $gameDrawer,
     )
@@ -54,8 +60,9 @@ class OngoingGame implements Routine
     {
         $this->sendGame(true);
         $this->sendGame();
+        $this->createCommands();
 
-        $this->discord->on(Event::MESSAGE_CREATE, [$this, 'onMessage']);
+        $this->dispatcher->on('paint', [$this, 'onCommand']);
     }
 
     /**
@@ -63,7 +70,7 @@ class OngoingGame implements Routine
      */
     public function destroy()
     {
-        $this->discord->removeListener(Event::MESSAGE_CREATE, [$this, 'onMessage']);
+        $this->dispatcher->removeListener('paint', [$this, 'onCommand']);
 
         $this->repository->destroyByTags(['zero_dollar_game', 'subroutine']);
     }
@@ -71,25 +78,214 @@ class OngoingGame implements Routine
     /**
      * On message callback.
      *
-     * @param Message $message
+     * @param Interaction $interaction
      * @return void
      */
-    public function onMessage(Message $message)
+    public function onCommand(Interaction $interaction)
     {
-        if ($message->channel_id !== $this->game->channel_id) {
+        if ($interaction->channel_id !== $this->game->channel_id) {
             return;
         }
 
-        $lines = explode("\n", $message->content);
+        $rectangle = $interaction->data->options->offsetGet('rectangle');
+        $pixel = $interaction->data->options->offsetGet('pixel');
+        $pixelart = $interaction->data->options->offsetGet('pixelart');
 
-        foreach ($lines as $line) {
-            if (preg_match('/(paint|color|colour|pixel) *(?P<arguments>.*)/i', $line, $matches)) {
-                $this->handlePaintCommand($message->author, $matches['arguments']);
-
-                $this->sendGame(true);
-                $this->sendGame();
-            }
+        if ($rectangle) {
+            $this->paintRectangle(
+                $interaction->user,
+                $rectangle->options->offsetGet('bottom_left_x')->value - 1,
+                $rectangle->options->offsetGet('bottom_left_y')->value - 1,
+                $rectangle->options->offsetGet('top_right_x')->value - 1,
+                $rectangle->options->offsetGet('top_right_y')->value - 1,
+                $rectangle->options->offsetGet('color')->value,
+            );
         }
+
+        if ($pixel) {
+            $this->paintPixel(
+                $interaction->user,
+                $pixel->options->offsetGet('x')->value - 1,
+                $pixel->options->offsetGet('y')->value - 1,
+                $pixel->options->offsetGet('color')->value,
+            );
+        }
+
+        if ($pixelart) {
+            $attachment = $interaction->data->resolved->attachments->first();
+
+            $this->paintImage(
+                $interaction->user,
+                $pixelart->options->offsetGet('x')->value - 1,
+                $pixelart->options->offsetGet('y')->value - 1,
+                $attachment,
+            );
+        }
+
+        $interaction->respondWithMessage(
+            MessageBuilder::new()
+                ->setContent('Your paint is my command!')
+        );
+
+        $this->sendGame(true);
+        $this->sendGame();
+    }
+
+    /**
+     * Create the commands.
+     *
+     * @return void
+     */
+    protected function createCommands()
+    {
+        $rectangleOption = $this->createRectangleOption();
+        $pixelOption = $this->createPixelOption();
+        $pixelArtOption = $this->createPixelArtOption();
+
+        $this->discord->application->commands->save(
+            $this->discord->application->commands->create(CommandBuilder::new()
+                ->setName('paint')
+                ->setType(1)
+                ->setDescription('Paint on the board!')
+                ->addOption($rectangleOption)
+                ->addOption($pixelOption)
+                ->addOption($pixelArtOption)
+                ->toArray()
+            )
+        )->then([$this->dispatcher, 'register']);
+    }
+
+    /**
+     * Create a rectangle option.
+     *
+     * @return Option
+     */
+    protected function createRectangleOption()
+    {
+        $rectangleOption = (new Option($this->discord))
+            ->setName('rectangle')
+            ->setDescription('Paint a rectangle.')
+            ->setType(Option::SUB_COMMAND);
+
+        $topLeftX = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('bottom_left_x')
+            ->setMinValue(0)
+            ->setDescription('The top left x coordinate.')
+            ->setRequired(true);
+
+        $topLeftY = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('bottom_left_y')
+            ->setMinValue(0)
+            ->setDescription('The top left y coordinate.')
+            ->setRequired(true);
+
+        $bottomRightX = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('top_right_x')
+            ->setMinValue(0)
+            ->setDescription('The bottom right x coordinate.')
+            ->setRequired(true);
+
+        $bottomRightY = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('top_right_y')
+            ->setMinValue(0)
+            ->setDescription('The bottom right y coordinate.')
+            ->setRequired(true);
+
+        $color = (new Option($this->discord))
+            ->setType(Option::STRING)
+            ->setName('color')
+            ->setDescription('The color name.')
+            ->setRequired(true);
+
+        $rectangleOption->addOption($topLeftX);
+        $rectangleOption->addOption($topLeftY);
+        $rectangleOption->addOption($bottomRightX);
+        $rectangleOption->addOption($bottomRightY);
+        $rectangleOption->addOption($color);
+
+        return $rectangleOption;
+    }
+
+    /**
+     * Create a pixel option.
+     *
+     * @return Option
+     */
+    protected function createPixelOption()
+    {
+        $pixelOption = (new Option($this->discord))
+            ->setName('pixel')
+            ->setDescription('Paint a single pixel.')
+            ->setType(Option::SUB_COMMAND);
+
+        $x = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('x')
+            ->setMinValue(0)
+            ->setDescription('The x coordinate.')
+            ->setRequired(true);
+
+        $y = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('y')
+            ->setMinValue(0)
+            ->setDescription('The y coordinate.')
+            ->setRequired(true);
+
+        $color = (new Option($this->discord))
+            ->setType(Option::STRING)
+            ->setName('color')
+            ->setDescription('The color name.')
+            ->setRequired(true);
+
+        $pixelOption->addOption($x);
+        $pixelOption->addOption($y);
+        $pixelOption->addOption($color);
+
+        return $pixelOption;
+    }
+
+    /**
+     * Create a pixel art option.
+     *
+     * @return Option
+     */
+    protected function createPixelArtOption()
+    {
+        $pixelOption = (new Option($this->discord))
+            ->setName('pixelart')
+            ->setDescription('Paint your pixel art.')
+            ->setType(Option::SUB_COMMAND);
+
+        $x = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('x')
+            ->setMinValue(0)
+            ->setDescription('The x coordinate.')
+            ->setRequired(true);
+
+        $y = (new Option($this->discord))
+            ->setType(Option::NUMBER)
+            ->setName('y')
+            ->setMinValue(0)
+            ->setDescription('The y coordinate.')
+            ->setRequired(true);
+
+        $image = (new Option($this->discord))
+            ->setType(Option::ATTACHMENT)
+            ->setName('image')
+            ->setDescription('The image to insert.')
+            ->setRequired(true);
+
+        $pixelOption->addOption($x);
+        $pixelOption->addOption($y);
+        $pixelOption->addOption($image);
+
+        return $pixelOption;
     }
 
     /**
@@ -111,26 +307,41 @@ class OngoingGame implements Routine
     }
 
     /**
-     * Handle the paint command.
+     * Handle a image paint command.
      *
      * @param User $user
-     * @param string $command
+     * @param int $baseX
+     * @param int $baseY
+     * @param Attachment
      * @return void
      */
-    protected function handlePaintCommand($user, $command)
+    protected function paintImage($user, $baseX, $baseY, $attachment)
     {
-        if (str_contains($command, 'and') || str_contains($command, ',')) {
-            $parts = preg_split('/(\W+and\W+)| *, */i', $command);
-
-            foreach ($parts as $part) {
-                $this->handlePaintCommand($user, $command);
-            }
-
+        if ( ! $attachment->content_type === 'image/jpg' && ! $attachment->content_type === 'image/png') {
             return;
         }
 
-        $this->handleRangePaintCommand($user, $command);
-        $this->handleSinglePaintCommand($user, $command);
+        $image = ImageManagerStatic::make($attachment->url);
+        $withWhite = true;
+        $height = $image->getHeight();
+
+        foreach (range(0, $image->getWidth() - 1) as $x) {
+            foreach (range(0, $image->getHeight() - 1) as $y) {
+                $colour = $image->pickColor($x, $y);
+
+                $canBePainted = collect($colour)->last() == 1;
+
+                if (false) {
+                    $canBePainted = $canBePainted && $colour != [255, 255, 255, 1];
+                }
+
+                $colourString = (string) (new Rgb($colour[0], $colour[1], $colour[2]))->toHex();
+
+                if ($canBePainted) {
+                    $this->paintPixel($user, $baseX + $x, $baseY + $height - $y - 1, $colourString);
+                }
+            }
+        }
     }
 
     /**
@@ -140,88 +351,45 @@ class OngoingGame implements Routine
      * @param string $command
      * @return void
      */
-    protected function handleRangePaintCommand($user, $command)
+    protected function paintRectangle($user, $x1, $y1, $x2, $y2, $color)
     {
-        if (preg_match('/(?P<x1>\d+) +(?P<y1>\d+) +to +(?P<x2>\d+) +(?P<y2>\d+)( +(?P<modifier>dark|light)? *(?P<choice>[a-z0-9 #]+))?/i', $command, $matches)) {
-            $x1 = $matches['x1'] - 1;
-            $y1 = $matches['y1'] - 1;
-            $x2 = $matches['x2'] - 1;
-            $y2 = $matches['y2'] - 1;
-            $modifier = $matches['modifier'] ?? null;
-            $choice = $matches['choice'] ?? null;
-
-            foreach (range($x1, $x2) as $x) {
-                foreach (range($y1, $y2) as $y) {
-                    $gatheredPixels[] = [$x, $y];
-                }
-            }
-
-            if ($x1 < 0 || $x1 >= $this->game->width) {
-                return;
-            }
-
-            if ($y1 < 0 || $y1 >= $this->game->height) {
-                return;
-            }
-
-            if ($x2 < 0 || $x2 >= $this->game->width) {
-                return;
-            }
-
-            if ($y2 < 0 || $y2 >= $this->game->height) {
-                return;
-            }
-
-            if ($choice) {
-                $this->paintPixels($user, $modifier, $gatheredPixels, $choice);
+        foreach (range($x1, $x2) as $x) {
+            foreach (range($y1, $y2) as $y) {
+                $gatheredPixels[] = [$x, $y];
             }
         }
-    }
 
-    /**
-     * Handle a single paint command.
-     *
-     * @param User $user
-     * @param string $command
-     * @return void
-     */
-    protected function handleSinglePaintCommand($user, $command)
-    {
-        if (preg_match('/(?P<x>\d+) +(?P<y>\d+)( +(?P<modifier>dark|light)? *(?P<choice>[a-z0-9 #]+))?/i', $command, $matches)) {
-            $x = $matches['x'] - 1;
-            $y = $matches['y'] - 1;
-            $modifier = $matches['modifier'] ?? null;
-            $choice = $matches['choice'] ?? null;
-
-            $gatheredPixels[] = [$x, $y];
-
-            if ($x < 0 || $x >= $this->game->width) {
-                return;
-            }
-
-            if ($y < 0 || $y >= $this->game->height) {
-                return;
-            }
-
-            if ($choice) {
-                $this->paintPixels($user, $modifier, $gatheredPixels, $choice);
-            }
+        if ($x1 < 0 || $x1 >= $this->game->width) {
+            return;
         }
+
+        if ($y1 < 0 || $y1 >= $this->game->height) {
+            return;
+        }
+
+        if ($x2 < 0 || $x2 >= $this->game->width) {
+            return;
+        }
+
+        if ($y2 < 0 || $y2 >= $this->game->height) {
+            return;
+        }
+
+        $this->paintPixels($user, $gatheredPixels, $color);
     }
 
     /**
      * Paint the given pixels.
      *
      * @param User $user
-     * @param string $modifier
      * @param array[]int[] $pixels
-     * @param string $choice
+     * @param string $color
      * @return void
      */
-    protected function paintPixels($user, $modifier, $pixels, $choice)
+    protected function paintPixels($user, $pixels, $color)
     {
         foreach ($pixels as $pixel) {
-            $this->paintPixel($user, $modifier, $pixel[0], $pixel[1], $choice);
+            $this->paintPixel($user, $pixel[0], $pixel[1], $color);
         }
     }
 
@@ -229,14 +397,26 @@ class OngoingGame implements Routine
      * Paint the given pixel.
      *
      * @param User $user
-     * @param string $modifier
      * @param string|int $x
      * @param string|int $y
-     * @param string $choice
+     * @param string $color
      * @return void
      */
-    protected function paintPixel($user, $modifier, $x, $y, $choice)
+    protected function paintPixel($user, $x, $y, $color)
     {
+        if ($x < 0 || $x >= $this->game->width) {
+            return;
+        }
+
+        if ($y < 0 || $y >= $this->game->height) {
+            return;
+        }
+
+        preg_match('/(?P<modifier>dark|light)? *(?P<choice>[a-z0-9 #]+)/i', $color, $matches);
+
+        $modifier = $matches['modifier'] ?? null;
+        $choice = $matches['choice'];
+
         $normalizedChoice = preg_replace('/[^a-z0-9]/', '', strtolower($choice));
         $colour = config('zero-dollar-game.aliases.' . $normalizedChoice, function() use ($choice) {
             try {
