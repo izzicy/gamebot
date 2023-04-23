@@ -13,4 +13,15 @@ return [
 
     'token' => env('DISCORD_TOKEN'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Registered Admin User
+    |--------------------------------------------------------------------------
+    |
+    | Users who have special privileges.
+    |
+    */
+
+    'admins' => explode(',', env('ADMINS', '')),
+
 ];
