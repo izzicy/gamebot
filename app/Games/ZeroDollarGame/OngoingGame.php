@@ -39,6 +39,7 @@ class OngoingGame implements Routine
         protected InteractionDispatcher $dispatcher,
         protected Game $game,
         protected GameDrawer $gameDrawer,
+        protected $createdRecently = false,
     )
     {
     }
@@ -56,8 +57,10 @@ class OngoingGame implements Routine
      */
     public function initialize()
     {
-        $this->sendGame(true);
-        $this->sendGame();
+        if ($this->createdRecently) {
+            $this->sendGame(true);
+            $this->sendGame();
+        }
 
         $this->dispatcher->on('paint', [$this, 'onCommand']);
     }

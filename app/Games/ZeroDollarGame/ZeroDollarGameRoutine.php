@@ -101,6 +101,7 @@ class ZeroDollarGameRoutine implements Routine
 
                 $this->repository->create(OngoingGame::class, [
                     'game' => $game,
+                    'createdRecently' => true,
                 ])->initialize();
             }
         }
