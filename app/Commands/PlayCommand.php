@@ -2,11 +2,7 @@
 
 namespace App\Commands;
 
-use App\Contracts\Discord\DiscordManager;
 use App\Contracts\Routines\Repository;
-use App\Games\Program\ProgramSession;
-use App\Games\Reminders\RemindersSession;
-use App\Games\Test\TestSession;
 use App\Routines\MainRoutine;
 use Discord\Discord;
 use Illuminate\Console\Scheduling\Schedule;

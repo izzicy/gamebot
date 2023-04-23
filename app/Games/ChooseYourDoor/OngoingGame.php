@@ -4,6 +4,7 @@ namespace App\Games\ChooseYourDoor;
 
 use App\Contracts\Routines\Repository;
 use App\Contracts\Routines\Routine;
+use App\Contracts\Schedule\Scheduler;
 use App\Games\ChooseYourDoor\Models\Game;
 use App\Routines\Concerns\HasId;
 use Discord\Builders\MessageBuilder;
@@ -26,12 +27,14 @@ class OngoingGame implements Routine
      * @param Repository $repository
      * @param Game $game
      * @param PromptImageCreator $promptImageCreator
+     * @param Scheduler $scheduler
      */
     public function __construct(
         protected Discord $discord,
         protected Repository $repository,
         protected Game $game,
         protected PromptImageCreator $promptImageCreator,
+        protected Scheduler $scheduler,
     )
     {
     }
@@ -49,7 +52,9 @@ class OngoingGame implements Routine
      */
     public function initialize()
     {
-        $this->runInterval();
+        foreach (config('choose-your-door.playtimes') as $playtime) {
+            $this->runInterval($playtime);
+        }
     }
 
     /**
@@ -63,16 +68,17 @@ class OngoingGame implements Routine
     /**
      * Run the interval.
      *
+     * @param string $playtime
      * @return void
      */
-    protected function runInterval()
+    protected function runInterval($playtime)
     {
         if ( ! $this->game->last_message_id) {
-            $this->postNewGame()->then(fn () => $this->runInterval());
+            $this->postNewGame()->then(fn () => $this->runInterval($playtime));
         } else {
-            sleep(config('choose-your-door.game_interval'))
+            $this->scheduler->atTime($playtime)
                 ->then(fn () => $this->updateGame())
-                ->then(fn () => $this->runInterval());
+                ->then(fn () => $this->runInterval($playtime));
         }
     }
 
