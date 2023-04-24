@@ -8,6 +8,7 @@ use App\Games\ChooseYourDoor\ChooseYourDoorRoutine;
 use App\Games\Diagnostics\DiagnosticsRoutine;
 use App\Games\Reminders\ReminderRoutine;
 use App\Games\RockPaperScissors\RockPaperScissorsRoutine;
+use App\Games\Snowflake\SnowflakeRoutine;
 use App\Games\ZeroDollarGame\ZeroDollarGameRoutine;
 use App\Games\WhoAmI\WhoAmIRoutine;
 use App\Routines\Concerns\HasId;
@@ -44,6 +45,7 @@ class MainRoutine implements Routine, WantsRepository
         $this->startRoutine(DiagnosticsRoutine::class);
         $this->startRoutine(RockPaperScissorsRoutine::class);
         $this->startRoutine(ChooseYourDoorRoutine::class);
+        $this->startRoutine(SnowflakeRoutine::class);
         // $this->startRoutine(ResolveRoutine::class);
     }
 
