@@ -134,6 +134,7 @@ return [
         'at the local supermarket',
         'at Mount Everest',
         'in Amsterdam',
+        'in an amusement park',
     ],
 
     /*
@@ -152,6 +153,7 @@ return [
         ':usernames found :thing :place, and it turned out to be a cursed object that brought all of their worst fears and nightmares to life!',
         ':usernames found :thing while they were :place and it was terrible!',
         'During their trip :place, :usernames found :thing. How outrageous!',
+        'After being lost :place, :usernames stumbled upon :thing.',
     ],
 
     /*
