@@ -4,6 +4,7 @@ namespace App\Routines;
 
 use App\Contracts\Routines\Routine;
 use App\Contracts\Routines\WantsRepository;
+use App\Games\CatClicker\CatClickerRoutine;
 use App\Games\ChooseYourDoor\ChooseYourDoorRoutine;
 use App\Games\Diagnostics\DiagnosticsRoutine;
 use App\Games\Reminders\ReminderRoutine;
@@ -46,6 +47,7 @@ class MainRoutine implements Routine, WantsRepository
         $this->startRoutine(RockPaperScissorsRoutine::class);
         $this->startRoutine(ChooseYourDoorRoutine::class);
         $this->startRoutine(SnowflakeRoutine::class);
+        $this->startRoutine(CatClickerRoutine::class);
         // $this->startRoutine(ResolveRoutine::class);
     }
 
