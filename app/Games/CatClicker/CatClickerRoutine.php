@@ -106,13 +106,13 @@ class CatClickerRoutine implements Routine
      */
     public function onInteraction(Interaction $interaction)
     {
-        $interaction->acknowledge();
-
         if ($this->stringCoder->is($interaction->data->custom_id, 'cclick')) {
             $data = $this->stringCoder->decode($interaction->data->custom_id);
             $id = $data['i'] ?? '';
 
             if ( ! empty($this->busy[$id])) {
+                $interaction->acknowledge();
+
                 return;
             }
 
@@ -138,7 +138,7 @@ class CatClickerRoutine implements Routine
                     ->addFile($this->getImage($chosenCat));
             }
 
-            $interaction->message->edit($message)->then(function() use ($id) {
+            $interaction->updateMessage($message)->then(function() use ($id) {
                 unset($this->busy[$id]);
             });
         }
