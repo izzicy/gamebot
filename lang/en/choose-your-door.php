@@ -43,7 +43,7 @@ return [
             'Winning a luxury yacht allowed :usernames to sail the seas in style, hosting epic parties and living like royalty.',
             ':usernames won a mansion in the Hollywood Hills, where they hobnobbed with celebrities and threw lavish parties every weekend.',
 
-            // Thing / places
+            // Previously Things / places
 
             '{1} :usernames stumbled upon :thing :place and was instantly imbued with superhuman powers!
             |[2,*] :usernames stumbled upon :thing :place and were instantly imbued with superhuman powers!',
@@ -89,7 +89,7 @@ return [
             '{1} :usernames was struck by a freak lightning storm that caused them to shrink down to the size of ants, facing danger at every turn as they navigated through a world full of giant creatures.
             |[2,*] :usernames were struck by a freak lightning storm that caused them to shrink down to the size of ants, facing danger at every turn as they navigated through a world full of giant creatures.',
 
-            // Thing / Places
+            // Previously Thing / Places
 
             'After :usernames discovered :thing :place, they were plagued by a series of bizarre accidents and unexplained phenomena, all of which seemed to be connected to their discovery!',
             ':usernames found :thing :place and uncovered a deadly booby trap that threatened to unleash a swarm of venomous snakes upon them!',
