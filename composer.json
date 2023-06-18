@@ -21,6 +21,7 @@
         "illuminate/database": "^10.0",
         "illuminate/translation": "^10.7",
         "intervention/image": "^2.7",
+        "intonate/tinker-zero": "^1.2",
         "laravel-zero/framework": "^10",
         "nunomaduro/termwind": "^1.13",
         "react/promise-timer": "^1.9",

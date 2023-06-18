@@ -71,6 +71,7 @@ class ReactionRoutine implements Routine
 
             return $this->discord->getChannel($this->game->channel_id)->sendMessage(
                 MessageBuilder::new()
+                    ->setAllowedMentions(['users' => [123]])
                     ->addFile($filePath)
                     ->setContent($message)
             );
@@ -101,7 +102,7 @@ class ReactionRoutine implements Routine
         $phrases = [];
 
         foreach ($usersByReactions as $reaction => $users) {
-            $usersnames = collect($users)->map(fn ($user) => $user->username)->values()->all();
+            $usersnames = collect($users)->map(fn ($user) => "<@$user->id>")->values()->all();
             $isWon = in_array($reaction, $this->correctChoices);
             $isCheater = $reaction === 'cheater';
 

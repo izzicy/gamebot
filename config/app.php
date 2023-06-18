@@ -107,6 +107,7 @@ return [
 
     'providers' => [
         Illuminate\Translation\TranslationServiceProvider::class,
+        Intonate\TinkerZero\TinkerZeroServiceProvider::class,
 
         App\Providers\AppServiceProvider::class,
         App\Providers\DiscordServiceProvider::class,
