@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Games\ChooseYourDoor\Contracts\PhraseGenerator;
-use App\Games\ChooseYourDoor\Phrases\GeneralPhraseGenerator;
 use Illuminate\Support\ServiceProvider;
 
 class ChooseYourDoorServiceProvider extends ServiceProvider
@@ -25,6 +23,6 @@ class ChooseYourDoorServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(PhraseGenerator::class, GeneralPhraseGenerator::class);
+        $this->app->singleton(\App\Games\ChooseYourDoor\Contracts\PhraseFactory::class, \App\Games\ChooseYourDoor\Phrases\PhraseFactory::class);
     }
 }

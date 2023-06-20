@@ -4,7 +4,7 @@ namespace App\Games\ChooseYourDoor;
 
 use App\Contracts\Routines\Repository;
 use App\Contracts\Routines\Routine;
-use App\Games\ChooseYourDoor\Contracts\PhraseGenerator;
+use App\Games\ChooseYourDoor\Contracts\PhraseFactory;
 use App\Games\ChooseYourDoor\Models\Game;
 use App\Routines\Concerns\HasId;
 use Discord\Builders\MessageBuilder;
@@ -12,6 +12,7 @@ use Discord\Discord;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\Channel\Reaction;
 use Discord\Parts\User\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use React\Promise\PromiseInterface;
 
@@ -33,14 +34,14 @@ class ReactionRoutine implements Routine
      *
      * @param Discord $discord
      * @param Repository $repository
-     * @param PhraseGenerator $phraseGenerator
+     * @param PhraseFactory $phraseFactory
      * @param ResultsImageCreator $resultsImageCreator
      * @param Game $game
      */
     public function __construct(
         protected Discord $discord,
         protected Repository $repository,
-        protected PhraseGenerator $phraseGenerator,
+        protected PhraseFactory $phraseFactory,
         protected ResultsImageCreator $resultsImageCreator,
         protected Game $game,
     )
@@ -98,21 +99,28 @@ class ReactionRoutine implements Routine
      */
     protected function createMessage(ReactionCollector $reactions)
     {
+        $generator = $this->phraseFactory->createPhraseGenerator();
         $usersByReactions = $reactions->getUsersByReactions();
         $phrases = [];
+        $phrasesByReaction = [];
+        $shuffledReactions = Arr::shuffleAssoc($usersByReactions);
 
-        foreach ($usersByReactions as $reaction => $users) {
+        foreach ($shuffledReactions as $reaction => $users) {
             $usersnames = collect($users)->map(fn ($user) => "<@$user->id>")->values()->all();
             $isWon = in_array($reaction, $this->correctChoices);
             $isCheater = $reaction === 'cheater';
 
             if ($isCheater) {
-                $phrases[] = $this->phraseGenerator->make($usersnames, 'CHEATER');
+                $phrasesByReaction[$reaction] = $generator->make($usersnames, 'CHEATER');
             } else if ($isWon) {
-                $phrases[] = $this->phraseGenerator->make($usersnames, 'WIN');
+                $phrasesByReaction[$reaction] = $generator->make($usersnames, 'WIN');
             } else {
-                $phrases[] = $this->phraseGenerator->make($usersnames, 'LOSE');
+                $phrasesByReaction[$reaction] = $generator->make($usersnames, 'LOSE');
             }
+        }
+
+        foreach ($usersByReactions as $reaction => $users) {
+            $phrases[] = $phrasesByReaction[$reaction];
         }
 
         return implode("\n", $phrases);

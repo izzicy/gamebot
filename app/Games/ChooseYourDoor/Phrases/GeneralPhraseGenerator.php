@@ -2,6 +2,7 @@
 
 namespace App\Games\ChooseYourDoor\Phrases;
 
+use App\Games\ChooseYourDoor\Contracts\PhraseCollection;
 use App\Games\ChooseYourDoor\Contracts\PhraseGenerator;
 use App\Games\ChooseYourDoor\Phrases\Concerns\CreatesItemsInSeries;
 use Illuminate\Support\Arr;
@@ -11,6 +12,22 @@ class GeneralPhraseGenerator implements PhraseGenerator
     use CreatesItemsInSeries;
 
     /**
+     * Construct a general phrase generator.
+     *
+     * @param PhraseCollection $winPhrases
+     * @param PhraseCollection $losePhrases
+     * @param PhraseCollection $cheaterPhrases
+     */
+    public function __construct(
+        protected PhraseCollection $winPhrases,
+        protected PhraseCollection $losePhrases,
+        protected PhraseCollection $cheaterPhrases,
+    )
+    {
+        //
+    }
+
+    /**
      * @inheritdoc
      */
     public function make($usernames, $state): string
@@ -18,21 +35,15 @@ class GeneralPhraseGenerator implements PhraseGenerator
         $parameters = $this->composeParameters($usernames, $state);
 
         if ($state === 'CHEATER') {
-            $cheaterPhrases = __('choose-your-door.cheater_callouts');
-
-            return trans_choice(Arr::random($cheaterPhrases), count($usernames), $parameters);
+            return trans_choice($this->cheaterPhrases->next(), count($usernames), $parameters);
         }
 
         if ($state === 'WIN') {
-            $winPhrases = __('choose-your-door.win_phrases');
-
-            return trans_choice(Arr::random($winPhrases), count($usernames), $parameters);
+            return trans_choice($this->winPhrases->next(), count($usernames), $parameters);
         }
 
         if ($state === 'LOSE') {
-            $losePhrases = __('choose-your-door.lose_phrases');
-
-            return trans_choice(Arr::random($losePhrases), count($usernames), $parameters);
+            return trans_choice($this->losePhrases->next(), count($usernames), $parameters);
         }
 
         return '';

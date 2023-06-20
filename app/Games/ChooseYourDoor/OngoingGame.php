@@ -76,9 +76,13 @@ class OngoingGame implements Routine
         if ( ! $this->game->last_message_id) {
             $this->postNewGame()->then(fn () => $this->runInterval($playtime));
         } else {
-            $this->scheduler->atTime($playtime)
+            \React\Promise\Timer\sleep(5)
                 ->then(fn () => $this->updateGame())
                 ->then(fn () => $this->runInterval($playtime));
+
+            // $this->scheduler->atTime($playtime)
+            //     ->then(fn () => $this->updateGame())
+            //     ->then(fn () => $this->runInterval($playtime));
         }
     }
 
