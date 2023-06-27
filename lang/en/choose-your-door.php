@@ -22,6 +22,12 @@ return [
         'It\'s choosing time!',
         'Choose a door, take a pick!',
         'Which door will you choose?',
+        'What will it be?',
+        'Which door will you choose?',
+        'Make your decision.',
+        'What will you decide?',
+        'Which door would you prefer?',
+        'Good luck!',
     ],
 
     /*
@@ -67,6 +73,10 @@ return [
         'ufo_madness' => [
             '{1} Harnessing the power of :something_ufo_defeating, :usernames has outsmarted the alien overlords and freed humanity from their reign!
             |[2,*] Harnessing the power of :something_ufo_defeating, :usernames have outsmarted the alien overlords and freed humanity from their reign!',
+        ],
+        'space_mission' => [
+            '{1} After a lengthy voyage, our brave explorer :usernames gracefully touch down on :planet!
+            |[2,*] After a lengthy voyage, our brave explorers :usernames gracefully touch down on :planet!',
         ],
     ],
 
@@ -117,6 +127,10 @@ return [
             '{1} Our hero, :usernames, met an unexpected demise as :crashing_thing_ufo suddenly crashed into them!
             |[2,*] Our heroes, :usernames, met an unexpected demise as :crashing_thing_ufo suddenly crashed into them!',
         ],
+        'space_mission' => [
+            'The space ship collided with :space_thing_to_collide_with, leaving :usernames adrift in the vast expanse of interstellar space!',
+            'Following the touchdown of :usernames on the alien planet, the seemingly hospitable extraterrestrials shed their veneer and wreak havoc on their space ship!',
+        ],
     ],
 
 
@@ -158,7 +172,12 @@ return [
             'a 1970s computer virus',
             'a giant nuke',
             'the deus ex machina',
-        ]
+        ],
+        'planet' => [
+            'the planet of rainbows and unicorns',
+            'planet Nirn',
+            'the planet of awesomeness',
+        ],
     ],
 
     /*
@@ -204,13 +223,18 @@ return [
         'crashing_thing_ufo' => [
             'a UFO',
             'a figher jet',
-            'an reckless hot air balloon',
+            'a reckless hot air balloon',
             'a satalite',
         ],
         'bad_thing_castle' => [
             'they ended up getting crushed by a naga\'s coils!',
             'the dragon proceeded to burn them to a crisp!',
             'they turned into stone by the stern gaze of Medusa!',
+        ],
+        'space_thing_to_collide_with' => [
+            'a space whale',
+            'a rogue asteroid',
+            'a teapot in space',
         ],
     ],
 
