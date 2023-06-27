@@ -52,30 +52,7 @@ class RockPaperScissorsRoutine implements Routine
      */
     public function initialize()
     {
-        $choice = (new Option($this->discord))
-            ->setType(Option::STRING)
-            ->setName('choice')
-            ->setDescription('Choose either rock, paper, or scissors.')
-            ->addChoice((new Choice($this->discord))->setName('rock')->setValue('rock'))
-            ->addChoice((new Choice($this->discord))->setName('paper')->setValue('paper'))
-            ->addChoice((new Choice($this->discord))->setName('scissors')->setValue('scissors'))
-            ->setRequired(true);
-
-        $user = (new Option($this->discord))
-            ->setType(Option::USER)
-            ->setName('user')
-            ->setDescription('Select an user to challenge or leave empty to play with the bot.');
-
-        $this->discord->application->commands->save(
-            $this->discord->application->commands->create(CommandBuilder::new()
-                ->setName('rps')
-                ->setDescription('Play a game of Rock Paper Scissors.')
-                ->addOption($choice)
-                ->addOption($user)
-                ->toArray()
-            )
-        )->then([$this->dispatcher, 'register']);
-
+        $this->dispatcher->register('rps');
         $this->dispatcher->on('rps', [$this, 'onCommand']);
         $this->discord->on(Event::INTERACTION_CREATE, [$this, 'onInteraction']);
     }

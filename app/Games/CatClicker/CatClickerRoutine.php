@@ -56,14 +56,7 @@ class CatClickerRoutine implements Routine
      */
     public function initialize()
     {
-        $this->discord->application->commands->save(
-            $this->discord->application->commands->create(CommandBuilder::new()
-                ->setName('cat_clicker')
-                ->setDescription('Play the cat clicker game.')
-                ->toArray()
-            )
-        )->then([$this->dispatcher, 'register']);
-
+        $this->dispatcher->register('cat_clicker');
         $this->dispatcher->on('cat_clicker', [$this, 'onCommand']);
         $this->discord->on(Event::INTERACTION_CREATE, [$this, 'onInteraction']);
     }

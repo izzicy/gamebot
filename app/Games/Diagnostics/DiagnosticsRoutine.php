@@ -44,14 +44,7 @@ class DiagnosticsRoutine implements Routine
      */
     public function initialize()
     {
-        $this->discord->application->commands->save(
-            $this->discord->application->commands->create(CommandBuilder::new()
-                ->setName('health')
-                ->setDescription('Display the bot\'s soft/hardware diagnostics.')
-                ->toArray()
-            )
-        )->then([$this->dispatcher, 'register']);
-
+        $this->dispatcher->register('health');
         $this->dispatcher->on('health', [$this, 'onCommand']);
     }
 

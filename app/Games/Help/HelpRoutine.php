@@ -46,15 +46,7 @@ class HelpRoutine implements Routine
      */
     public function initialize()
     {
-        $this->discord->application->commands->save(
-            $this->discord->application->commands->create(
-                CommandBuilder::new()
-                    ->setName('help')
-                    ->setDescription('This will show you anything I can help you with.')
-                    ->toArray()
-            )
-        )->then([$this->dispatcher, 'register']);
-
+        $this->dispatcher->register('help');
         $this->dispatcher->on('help', [$this, 'onCommand']);
     }
 

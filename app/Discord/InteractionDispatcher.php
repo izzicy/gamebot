@@ -25,8 +25,10 @@ class InteractionDispatcher extends EventEmitter implements InteractionDispatche
     /**
      * @inheritdoc
      */
-    public function register(Command $command)
+    public function register($command)
     {
-        $this->discord->listenCommand($command->name, fn (...$args) => $this->emit($command->name, $args));
+        $commandName = is_string($command) ? $command : $command->name;
+
+        $this->discord->listenCommand($commandName, fn (...$args) => $this->emit($commandName, $args));
     }
 }

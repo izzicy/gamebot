@@ -10,8 +10,8 @@ interface InteractionDispatcher extends EventEmitterInterface
     /**
      * Register the command.
      *
-     * @param Command $command
+     * @param Command|string $command
      * @return void
      */
-    public function register(Command $command);
+    public function register($command);
 }

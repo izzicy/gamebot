@@ -42,14 +42,7 @@ class WhoAmIRoutine implements Routine
      */
     public function initialize()
     {
-        $this->discord->application->commands->save(
-            $this->discord->application->commands->create(CommandBuilder::new()
-                ->setName('whoami')
-                ->setDescription('Tells who you are.')
-                ->toArray()
-            )
-        )->then([$this->dispatcher, 'register']);
-
+        $this->dispatcher->register('whoami');
         $this->dispatcher->on('whoami', [$this, 'onCommand']);
     }
 

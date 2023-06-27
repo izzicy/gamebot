@@ -47,22 +47,7 @@ class SnowflakeRoutine implements Routine
      */
     public function initialize()
     {
-        $snowflake = (new Option($this->discord))
-            ->setType(Option::STRING)
-            ->setRequired(true)
-            ->setName('snowflake')
-            ->setMaxLength(20)
-            ->setDescription('The snowflake from which timestamp must be extracted.');
-
-        $this->discord->application->commands->save(
-            $this->discord->application->commands->create(CommandBuilder::new()
-                ->setName('snowflake')
-                ->setDescription('Read the time from a Discord snowflake.')
-                ->addOption($snowflake)
-                ->toArray()
-            )
-        )->then([$this->dispatcher, 'register']);
-
+        $this->dispatcher->register('snowflake');
         $this->dispatcher->on('snowflake', [$this, 'onCommand']);
     }
 
