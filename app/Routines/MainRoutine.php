@@ -7,6 +7,7 @@ use App\Contracts\Routines\WantsRepository;
 use App\Games\CatClicker\CatClickerRoutine;
 use App\Games\ChooseYourDoor\ChooseYourDoorRoutine;
 use App\Games\Diagnostics\DiagnosticsRoutine;
+use App\Games\Help\HelpRoutine;
 use App\Games\Reminders\ReminderRoutine;
 use App\Games\RockPaperScissors\RockPaperScissorsRoutine;
 use App\Games\Snowflake\SnowflakeRoutine;
@@ -48,6 +49,7 @@ class MainRoutine implements Routine, WantsRepository
         $this->startRoutine(ChooseYourDoorRoutine::class);
         $this->startRoutine(SnowflakeRoutine::class);
         $this->startRoutine(CatClickerRoutine::class);
+        $this->startRoutine(HelpRoutine::class);
         // $this->startRoutine(ResolveRoutine::class);
     }
 
