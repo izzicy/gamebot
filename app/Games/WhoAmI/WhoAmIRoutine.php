@@ -69,9 +69,12 @@ class WhoAmIRoutine implements Routine
      */
     public function onCommand(Interaction $interaction)
     {
+        $user = $interaction->user;
+
         $interaction->respondWithMessage(
             MessageBuilder::new()
-                ->setContent('Your name is ' . $interaction->user->username . '.')
+                ->setContent("Your name is $user.")
+                ->setAllowedMentions(['users' => [123]])
         );
     }
 }
